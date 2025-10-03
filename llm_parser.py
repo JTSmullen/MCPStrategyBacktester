@@ -110,8 +110,8 @@ def parse_strategy(strategy_nl: str) -> dict:
               dictionary if parsing fails for any reason.
     """
     
-    # Select the specific Gemini model to use. 'gemini-1.5-flash' is fast and capable.
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Select the specific Gemini model to use. 'gemini-2.5-flash' is fast and capable.
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
     # --- Prompt Engineering ---
     # A detailed, structured prompt is crucial for getting reliable and correctly

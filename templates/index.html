@@ -1,81 +1,58 @@
-<!--
- * @fileoverview Main HTML document for the Algorithmic Trading Backtester frontend.
- *
- * This file defines the structure and content of the user interface. It includes:
- * - A text area for users to input their trading strategy in natural language.
- * - A button to trigger the backtest process.
- * - Designated sections to display the summary results, detailed performance metrics,
- *   and a chart showing the portfolio's value over time.
- *
- * Dependencies:
- * - `style.css`: For all visual styling and layout.
- * - `Chart.js`: A third-party library loaded via CDN for rendering the portfolio chart.
- * - `app.js`: The custom JavaScript file that handles user interactions, API calls,
- *   and dynamic updates to the DOM.
- *
- * Note: This is a Flask template, so it uses `{{ url_for(...) }}` to generate URLs
- * for static assets (CSS and JS), ensuring they work correctly regardless of
- * where the application is hosted.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Basic HTML5 metadata -->
     <meta charset="UTF-8">
-    <!-- Ensures the page is responsive and scales correctly on different devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- The title displayed in the browser tab -->
     <title>Trading Strategy Backtester</title>
-    
-    <!-- Link to the external stylesheet for this page. Flask's `url_for` generates the correct path. -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
-    <!-- Include the Chart.js library from a CDN (Content Delivery Network) for performance and convenience. -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- The main container that centers and styles all content on the page. -->
+    <!--
+     * @fileoverview Main HTML document for the Algorithmic Trading Backtester frontend.
+     *
+     * This file defines the structure and content of the user interface. It includes:
+     * - A text area for users to input their trading strategy in natural language.
+     * - A button to trigger the backtest process.
+     * - Designated sections to display the summary results, detailed performance metrics,
+     *   and a chart showing the portfolio's value over time.
+     *
+     * Dependencies:
+     * - `style.css`: For all visual styling and layout.
+     * - `Chart.js`: A third-party library loaded via CDN for rendering the portfolio chart.
+     * - `app.js`: The custom JavaScript file that handles user interactions, API calls,
+     *   and dynamic updates to the DOM.
+     *
+     * Note: This is a Flask template, so it uses the "url_for()" function to generate URLs
+     * for static assets (CSS and JS), ensuring they work correctly regardless of
+     * where the application is hosted.
+    -->
     <div class="container">
-        
-        <!-- === INPUT SECTION === -->
-        <!-- The main heading of the application. -->
         <h1>Trading Strategy Backtester</h1>
-        
-        <!-- A multi-line text input for the user to describe their strategy. -->
         <textarea id="strategy-input" placeholder="Example: Buy when the 20-day SMA crosses above the 50-day EMA, sell when it crosses below."></textarea>
-        
-        <!-- The primary action button to initiate the backtest. -->
         <button id="backtest-btn">Run Backtest</button>
         
-        <!-- === RESULTS SECTION === -->
-        <!-- A CSS Grid container that organizes the chart and the metrics into a two-column layout on larger screens. -->
         <div class="main-results-layout">
-            
-            <!-- Column 1: Chart Container -->
             <div class="chart-container">
-                <!-- The canvas element is where Chart.js will draw the portfolio equity curve. -->
                 <canvas id="portfolioChart"></canvas>
             </div>
 
-            <!-- Column 2: Wrapper for Summary and Metrics -->
-            <!-- This nested grid organizes the two info cards vertically. -->
             <div class="metrics-and-summary-wrapper">
-                
-                <!-- Card 1: Backtest Summary -->
                 <div id="summary-results">
                     <h2>Backtest Results Summary</h2>
-                    <!-- Placeholder paragraphs and spans that will be populated by JavaScript with dynamic data. -->
-                    <p>Final Portfolio Value: <span id="final-value">Waiting for results...</span></p>
-                    <p>Profit/Loss (PnL): <span id="pnl-value"></span></p>
+                    <!--
+                        The initial spans are empty in the final version.
+                        The "Waiting for results..." text from the README example has been removed for a cleaner initial state.
+                    -->
+                    <p>Final Portfolio Value: <span id="final-value"></span></p>
+                    <p>PnL: <span id="pnl-value"></span></p>
                 </div>
 
-                <!-- Card 2: Detailed Performance Metrics -->
                 <div id="performance-metrics">
                     <h2>Performance Metrics</h2>
-                    <!-- Each paragraph represents a single metric. The `<span>` is the target for JavaScript to insert the value. -->
                     <p>Sharpe Ratio: <span id="sharpe-ratio"></span></p>
                     <p>Total Return: <span id="total-return"></span>%</p>
-                    <p>Annual Return (CAGR): <span id="annual-return"></span>%</p>
+                    <p>Annual Return: <span id="annual-return"></span>%</p>
                     <p>Max Drawdown: <span id="max-drawdown"></span>%</p>
                     <p>Max Drawdown Duration: <span id="max-drawdown-duration"></span> days</p>
                     <p>Total Trades: <span id="total-trades"></span></p>
@@ -90,10 +67,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- === SCRIPT LOADING === -->
-    <!-- The custom JavaScript for this page is loaded at the end of the body. -->
-    <!-- This is a best practice as it ensures the HTML DOM is fully loaded and parsed before the script tries to manipulate it. -->
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

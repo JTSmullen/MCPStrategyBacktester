@@ -451,6 +451,7 @@ def run_backtest(config):
     # --- Results Extraction and Processing ---
     final_value = cerebro.broker.getvalue()
     pnl = final_value - start_cash
+    total_return_pct = round((final_value - start_cash) / start_cash * 100, 2) if start_cash != 0 else 0.0
 
     # Prepare data for the equity curve chart.
     formatted_dates = []
@@ -485,63 +486,52 @@ def run_backtest(config):
     avg_loss = trade_analyzer_result.get('lost', {}).get('pnl', {}).get('average')
     avg_loss = round(avg_loss, 2) if avg_loss is not None and not pd.isna(avg_loss) else 0.0
 
-    # Initialize Alpha and Beta to 0.0
+        
+    # --- Advanced Metrics Calculation (Annual Return, Alpha, Beta) ---
     alpha = 0.0
     beta = 0.0
-    
-    # Calculate Compound Annual Growth Rate (CAGR).
-    num_years = 0.0
-    strategy_cagr = 0.0
-    if cerebro.datas and len(cerebro.datas) > 0:
-        backtest_start_date_data = cerebro.datas[0].datetime.date(0)
-        backtest_end_date_data = cerebro.datas[0].datetime.date(-1) 
-        num_days = (backtest_end_date_data - backtest_start_date_data).days
-        if num_days > 0:
-            num_years = num_days / 365.25
-            if final_value > 0 and start_cash > 0 and num_years > 0:
-                strategy_cagr = ((final_value / start_cash) ** (1/num_years)) - 1
-    annual_return_pct = round(strategy_cagr * 100, 2)
-    
-    # Calculate Alpha and Beta if benchmark data is available.
+    annual_return_pct = 0.0
+
     if len(first_strategy.portfolio_values) > 1 and not benchmark_df.empty:
-        # Create a pandas Series for strategy returns and benchmark returns.
-        strategy_pnl_series = pd.Series(first_strategy.portfolio_values, index=pd.to_datetime(first_strategy.dates))
+        # Convert portfolio values to a pandas Series
+        strategy_pnl_series = pd.Series(
+            first_strategy.portfolio_values,
+            index=pd.to_datetime(first_strategy.dates)
+        )
+
+        # Remove duplicate dates
+        strategy_pnl_series = strategy_pnl_series[~strategy_pnl_series.index.duplicated(keep="last")]
+
+        # Reindex to match benchmark dates (forward-fill gaps)
+        strategy_pnl_series = strategy_pnl_series.reindex(benchmark_df.index, method="ffill")
+
+        # Daily returns
         strategy_daily_returns = strategy_pnl_series.pct_change().dropna()
         benchmark_daily_returns = benchmark_df['close'].pct_change().dropna()
-        
-        # Align the returns data by date to ensure a fair comparison.
+
+        # Align dates
         common_dates = strategy_daily_returns.index.intersection(benchmark_daily_returns.index)
-        strategy_returns_aligned = strategy_daily_returns[common_dates]
-        benchmark_returns_aligned = benchmark_daily_returns[common_dates]
+        if len(common_dates) > 2:
+            strategy_returns_aligned = strategy_daily_returns.loc[common_dates]
+            benchmark_returns_aligned = benchmark_daily_returns.loc[common_dates]
 
-        # Proceed with calculation only if there's enough aligned data.
-        if not strategy_returns_aligned.empty and len(strategy_returns_aligned) > 1 and len(benchmark_returns_aligned) > 1:
-            # Calculate covariance matrix to find variance of benchmark and covariance between strategy and benchmark.
+            # === Annual Return ===
+            strategy_annual_return = strategy_returns_aligned.mean() * 252
+            benchmark_annual_return = benchmark_returns_aligned.mean() * 252
+            annual_return_pct = round(strategy_annual_return * 100, 2)
+
+            # === Beta ===
             covariance_matrix = np.cov(strategy_returns_aligned, benchmark_returns_aligned)
-            cov_strategy_benchmark = covariance_matrix[0, 1]
             var_benchmark = covariance_matrix[1, 1]
+            if var_benchmark != 0:
+                beta = covariance_matrix[0, 1] / var_benchmark
 
-            # Calculate benchmark's CAGR.
-            benchmark_cagr = 0.0
-            if not benchmark_df.empty:
-                initial_benchmark_price = benchmark_df['close'].iloc[0]
-                final_benchmark_price = benchmark_df['close'].iloc[-1]
-                if initial_benchmark_price != 0 and num_years > 0:
-                    benchmark_cagr = ((final_benchmark_price / initial_benchmark_price) ** (1/num_years)) - 1
-            
-            # Calculate Beta and then Alpha using the Capital Asset Pricing Model (CAPM) formula.
-            if var_benchmark != 0 and num_years > 0 and not pd.isna(strategy_cagr) and not pd.isna(benchmark_cagr):
-                beta = cov_strategy_benchmark / var_benchmark
-                if pd.isna(beta): beta = 0.0 # Handle potential NaN result
-                
-                risk_free_rate = first_strategy.p.risk_free_rate 
-                # Alpha = Strategy Return - (Risk-Free Rate + Beta * (Benchmark Return - Risk-Free Rate))
-                alpha_val = strategy_cagr - (risk_free_rate + beta * (benchmark_cagr - risk_free_rate))
-                if pd.isna(alpha_val): alpha_val = 0.0 # Handle potential NaN result
-                alpha = alpha_val
-    
-    # Calculate total percentage return.
-    total_return_pct = round(((final_value - start_cash) / start_cash) * 100, 2) if start_cash > 0 else 0.0
+            # === Alpha ===
+            risk_free_rate = first_strategy.p.risk_free_rate
+            alpha = strategy_annual_return - (risk_free_rate + beta * (benchmark_annual_return - risk_free_rate))
+
+
+
 
     # --- Compile Final Metrics Dictionary ---
     metrics = {

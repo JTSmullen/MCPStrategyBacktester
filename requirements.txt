@@ -2,3 +2,5 @@ Flask
 backtrader
 yfinance
 pandas
+google-generativeai
+numpy
