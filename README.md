@@ -104,7 +104,8 @@ Visit **http://127.0.0.1:5000** in your browser.
 2. Enter a strategy such as:  
    - *"Buy when the 14-day RSI is below 30, sell when above 70."*  
    - *"Go long when the price closes above the 20-day Bollinger Band, sell when below."*  
-   - *"Buy when MACD crosses above signal line, sell when below."*  
+   - *"Buy when MACD crosses above signal line, sell when below."*
+   - *"Go long when the 20-day SMA crosses above the 50-day EMA AND RSI(14) is below 60 AND the MACD line (12,26,9) is above the signal line. Exit the long position RSI(14) rises above 75 OR if the close price crosses below the lower Bollinger Band (20,2). "*
 3. Click **Run Backtest**.  
 4. Review metrics, summary stats, and interactive chart.  
 
@@ -114,7 +115,7 @@ Visit **http://127.0.0.1:5000** in your browser.
 ```bash
 .
 ├── assets/
-│   └── app-screenshot.png
+│   └── ExampleImg.png
 ├── static/
 │   ├── app.js
 │   └── style.css
