@@ -1,0 +1,188 @@
+/**
+ * @fileoverview Main stylesheet for the Algorithmic Trading Backtester Frontend.
+ *
+ * This file provides the styling for the `index.html` page, creating a modern,
+ * clean, and responsive user interface.
+ *
+ * Key Design Principles:
+ * - A light, professional color palette.
+ * - A responsive layout using CSS Grid that adapts from a two-column view on
+ *   desktops to a single-column view on mobile devices.
+ * - "Card"-based UI elements with soft shadows and rounded corners for depth.
+ * - Smooth transitions and subtle hover effects for better user experience.
+ * - A modern, readable font stack.
+ */
+
+/* --- Global Resets and Defaults --- */
+
+/* Universal box-sizing rule: Ensures that padding and borders are included in
+   the element's total width and height, which makes layout calculations far
+   more predictable and intuitive. */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    /* A modern, cross-platform font stack that prioritizes system UI fonts. */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    /* Use flexbox to center the main container both vertically and horizontally. */
+    display: flex;
+    justify-content: center;
+    min-height: 100vh; /* Ensure the body takes up at least the full viewport height. */
+    margin: 0; /* Remove default body margin. */
+    padding: 20px; /* Add some space around the container on smaller viewports. */
+    background-color: #f0f2f5; /* A light, neutral gray background. */
+    color: #333; /* Default text color. */
+    font-size: 16px; /* Set a comfortable base font size. */
+}
+
+/* --- Main Layout Container --- */
+
+.container {
+    text-align: center;
+    width: 100%; /* The container should be flexible and take up 100% of its parent's width. */
+    max-width: 1200px; /* But it should not exceed 1200px, keeping content from becoming too wide on large screens. */
+    background-color: #ffffff; /* White background for the main content card. */
+    padding: 25px;
+    border-radius: 12px; /* Slightly more pronounced rounded corners. */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* A stronger shadow gives the container a "lifted" feel. */
+}
+
+/* --- Typography and Form Elements --- */
+
+h1 {
+    color: #2c3e50; /* A dark, muted blue for the main heading. */
+    margin-bottom: 30px; /* Extra space below the heading. */
+    font-size: 2.4em; /* Make the heading prominent. */
+    font-weight: 700; /* Bolder font weight. */
+}
+
+textarea {
+    width: 100%;
+    min-height: 80px; /* A decent default height for strategy input. */
+    margin-bottom: 20px; /* Space below the textarea. */
+    padding: 12px;
+    border: 1px solid #cdd4da; /* A subtle, light gray border. */
+    border-radius: 8px;
+    font-size: 1em; /* Inherit font size from the body. */
+    resize: vertical; /* Allow users to resize the textarea vertically, but not horizontally. */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* A subtle inner shadow for depth. */
+}
+
+button {
+    padding: 12px 30px;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 30px; /* Space below the button before the results appear. */
+    cursor: pointer;
+    background-color: #007bff; /* A standard, vibrant blue for the primary action. */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    /* Define smooth transitions for background color and transform properties on hover. */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #0056b3; /* A darker blue on hover provides clear feedback. */
+    transform: translateY(-2px); /* A slight "lift" effect makes the button feel more interactive. */
+}
+
+/* --- Results Section Layout --- */
+
+/* This is the main grid for the results area, creating a two-column layout. */
+.main-results-layout {
+    display: grid;
+    /* The first column (chart) gets 2fr (twice the space) and the second (metrics) gets 1fr.
+       `minmax(0, ...)` is a crucial fix for grid layouts; it allows grid items to shrink
+       below their intrinsic minimum size, preventing overflow issues. */
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 30px; /* Increase the space between the chart and the metrics columns. */
+    align-items: start; /* Align items to the top of the grid area. */
+    margin-top: 20px;
+}
+
+.chart-container {
+    /* `position: relative` is required by Chart.js for tooltip positioning. */
+    position: relative;
+    height: 60vh; /* Set a height relative to the viewport height. */
+    width: 100%;
+    background-color: #ffffff;
+    padding: 20px;
+    border: 1px solid #e0e6eb; /* A very light border. */
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* A soft shadow for the chart card. */
+}
+
+/* A nested grid to organize the summary and metrics sections vertically within the second column. */
+.metrics-and-summary-wrapper {
+    display: grid;
+    grid-template-rows: auto auto; /* Rows will size to their content. */
+    gap: 25px; /* Space between the summary and the metrics cards. */
+}
+
+/* Shared styles for the summary and performance metrics cards. */
+#summary-results, #performance-metrics {
+    padding: 20px;
+    border: 1px solid #e0e6eb;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    text-align: left; /* Align text to the left within these cards. */
+    /* These properties ensure long text (like error messages) wraps correctly. */
+    word-wrap: break-word; /* For older browsers */
+    overflow-wrap: break-word; /* Standard property */
+}
+
+/* Styling for the subheadings inside the info cards. */
+#summary-results h2, #performance-metrics h2 {
+    margin-top: 0;
+    color: #4a69bd; /* A different, softer blue for secondary headings. */
+    font-size: 1.4em;
+    border-bottom: 1px solid #ebf0f4; /* A light line to separate heading from content. */
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+/* Styling for the paragraphs containing the metric labels and values. */
+#summary-results p, #performance-metrics p {
+    margin: 10px 0; /* Add vertical spacing between each metric. */
+    font-size: 0.98em;
+    color: #555;
+    line-height: 1.5; /* Improve readability with more line spacing. */
+}
+
+/* Specifically target the `<span>` elements that hold the metric *values* to make them stand out. */
+#summary-results p span, #performance-metrics p span {
+    font-weight: 700; /* Bolder font for the numbers. */
+    color: #2c3e50; /* Use the primary dark text color for contrast. */
+}
+
+
+/* --- Responsive Adjustments --- */
+
+/* Media query for tablets and smaller desktops (up to 992px wide). */
+@media (max-width: 992px) {
+    .main-results-layout {
+        grid-template-columns: 1fr; /* Stack the chart and metrics columns into a single column. */
+        gap: 25px;
+    }
+    .chart-container {
+        height: 45vh; /* Reduce chart height on smaller screens to save vertical space. */
+    }
+}
+
+/* Media query for mobile phones (up to 768px wide). */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px; /* Reduce padding on the main container for smaller screens. */
+    }
+    h1 {
+        font-size: 1.8em; /* Reduce heading size. */
+    }
+    button {
+        padding: 10px 20px; /* Reduce button size. */
+        font-size: 1em;
+    }
+}
